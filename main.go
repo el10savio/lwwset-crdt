@@ -9,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/el10savio/LWWSet-crdt/handlers"
+	"github.com/el10savio/lwwset-crdt/handlers"
 )
 
 const (
