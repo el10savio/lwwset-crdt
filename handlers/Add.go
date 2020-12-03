@@ -28,7 +28,7 @@ func Add(w http.ResponseWriter, r *http.Request) {
 	log.WithFields(log.Fields{
 		"set":   LWWSet,
 		"value": value,
-	}).Debug("successful twopset addition")
+	}).Debug("successful lwwset addition")
 
 	// Return HTTP 200 OK in the case of success
 	w.WriteHeader(http.StatusOK)
