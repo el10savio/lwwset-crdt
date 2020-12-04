@@ -15,8 +15,6 @@ func init() {
 	lwwset = Initialize()
 }
 
-// TODO: Test ReAdd Value After Removal
-
 // TestList checks the basic functionality of LWWSet List()
 // List() should return all unique values added to the LWWSet
 func TestList(t *testing.T) {
@@ -39,6 +37,22 @@ func TestList_UpdatedValue(t *testing.T) {
 	lwwset, _ = lwwset.Addition("zz")
 
 	expectedValue := []string{"xx", "yy", "zz"}
+	_, actualValue := lwwset.List()
+
+	assert.Equal(t, expectedValue, actualValue)
+
+	lwwset = Clear()
+}
+
+// TestList_ReAddValue checks the functionality of LWWSet List() when
+// a value is added to LWWSet after it got removed it should return
+// all the unique values added to the LWWSet
+func TestList_ReAddValue(t *testing.T) {
+	lwwset, _ = lwwset.Addition("xx")
+	lwwset, _ = lwwset.Removal("xx")
+	lwwset, _ = lwwset.Addition("xx")
+
+	expectedValue := []string{"xx"}
 	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
