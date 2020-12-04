@@ -3,12 +3,10 @@ package lwwset
 import (
 	"errors"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // package lwwset implements the LWWSet (Last Writer Wins Set) CRDT data type along with the functionality
-// to append, list & lookup values in a LWWSet. It also provides the functionality to merge multiple
+// to append, remove, list & lookup values in a LWWSet. It also provides the functionality to merge multiple
 // LWWSets together and a utility function to clear a LWWSet used in tests
 
 // LWWSet is the LWWSet CRDT data type
@@ -22,13 +20,16 @@ type LWWSet struct {
 	Remove LWWNodeSlice `json:"remove"`
 }
 
-// LWWNode TODO: ...
+// LWWNode stores a given value
+// along with a timestamp of
+// when it was added
 type LWWNode struct {
 	Value     string
 	Timestamp time.Time
 }
 
-// LWWNodeSlice ...
+// LWWNodeSlice is a
+// collection of LWWNodes
 type LWWNodeSlice []LWWNode
 
 // Initialize returns a new empty LWWSet
@@ -46,6 +47,8 @@ func (lwwset LWWSet) Addition(value string) (LWWSet, error) {
 		return lwwset, errors.New("empty value provided")
 	}
 
+	// Order the LWWSet according
+	// to the timestamps
 	lwwset = lwwset.orderList()
 
 	// Set = Set U value
@@ -53,7 +56,8 @@ func (lwwset LWWSet) Addition(value string) (LWWSet, error) {
 		lwwset.Add = append(lwwset.Add, LWWNode{Value: value, Timestamp: time.Now()})
 	}
 
-	// Return the new LWWSet followed by nil error
+	// Return the new LWWSet
+	// followed by nil error
 	return lwwset, nil
 }
 
@@ -64,6 +68,8 @@ func (lwwset LWWSet) Removal(value string) (LWWSet, error) {
 		return lwwset, errors.New("empty value provided")
 	}
 
+	// Order the LWWSet according
+	// to the timestamps
 	lwwset = lwwset.orderList()
 
 	// Set = Set U value
@@ -71,19 +77,21 @@ func (lwwset LWWSet) Removal(value string) (LWWSet, error) {
 		lwwset.Remove = append(lwwset.Remove, LWWNode{Value: value, Timestamp: time.Now()})
 	}
 
-	// Return the new LWWSet followed by nil error
+	// Return the new LWWSet
+	// followed by nil error
 	return lwwset, nil
 }
 
-// GetValues extracts all the values present in the LWWNode slice
-func (lwwnodeslice LWWNodeSlice) GetValues() []string {
-	if len(lwwnodeslice) == 0 {
+// GetValues extracts all the values
+// present in the LWWNode slice
+func (list LWWNodeSlice) GetValues() []string {
+	if len(list) == 0 {
 		return []string{}
 	}
 
 	values := make([]string, 0)
 
-	for _, lwwnode := range lwwnodeslice {
+	for _, lwwnode := range list {
 		values = append(values, lwwnode.Value)
 	}
 
@@ -96,36 +104,23 @@ func (lwwset LWWSet) List() (LWWSet, []string) {
 	return lwwset, lwwset.Add.GetValues()
 }
 
+// orderList iterates over the list and does
+// a look up if an element is present or not
 func (lwwset LWWSet) orderList() LWWSet {
 	// An element is a member of the LWW-Element-Set if it is in the add set, and either not in the remove
 	// set, or in the remove set but with an earlier timestamp than the latest timestamp in the add set.
-
 	for _, lwwNode := range lwwset.Add {
-		log.WithFields(log.Fields{
-			"lwwset":                   lwwset,
-			"present in remove":        isPresent(lwwNode.Value, lwwset.Remove),
-			"Time greater than remove": latestValue(lwwNode.Value, lwwset.Remove).Timestamp.UnixNano() < lwwNode.Timestamp.UnixNano(),
-		}).Debug("member check")
-
 		if !isPresent(lwwNode.Value, lwwset.Remove) || latestValue(lwwNode.Value, lwwset.Remove).Timestamp.UnixNano() < lwwNode.Timestamp.UnixNano() {
-			log.WithFields(log.Fields{
-				"set":   lwwset,
-				"value": lwwset.Add,
-			}).Debug("member of the LWW-Element-Set")
-		} else {
-			lwwset.Add = Delete(lwwset.Add, lwwNode.Value)
-			lwwset.Remove = Delete(lwwset.Remove, lwwNode.Value)
-			log.WithFields(log.Fields{
-				"set":   lwwset,
-				"value": lwwset.Add,
-			}).Debug("not a member of the LWW-Element-Set")
+			continue
 		}
+		lwwset.Add = Delete(lwwset.Add, lwwNode.Value)
+		lwwset.Remove = Delete(lwwset.Remove, lwwNode.Value)
 	}
-
 	return lwwset
 }
 
-// isPresent ...
+// isPresent checks if a given value
+// is present in the list or not
 func isPresent(value string, list LWWNodeSlice) bool {
 	for _, element := range list {
 		if element.Value == value {
@@ -135,21 +130,19 @@ func isPresent(value string, list LWWNodeSlice) bool {
 	return false
 }
 
+// latestValue returns the latest value in a
+// LWWNodeSlice according to the timestamp
 func latestValue(value string, list LWWNodeSlice) LWWNode {
 	maxNode := LWWNode{Value: value}
 	for _, element := range list {
 		if element.Value == maxNode.Value && element.Timestamp.UnixNano() > maxNode.Timestamp.UnixNano() {
-			log.WithFields(log.Fields{
-				"element": element,
-				"maxNode": maxNode,
-			}).Debug("latest Value Updated")
 			maxNode = element
 		}
 	}
 	return maxNode
 }
 
-// Delete removes an entry from the LWWNodeSlice
+// Delete removes an entry from the LWWNodeSlice list
 func Delete(list LWWNodeSlice, value string) LWWNodeSlice {
 	newList := LWWNodeSlice{}
 	for _, node := range list {
@@ -189,7 +182,7 @@ func (lwwset LWWSet) Lookup(value string) (bool, error) {
 func Merge(LWWSets ...LWWSet) LWWSet {
 	var LWWSetMerged LWWSet
 
-	// GSetMerged = GSetMerged U GSetToMergeWith
+	// LWWSetMerged = LWWSetMerged U LWWSetToMergeWith
 	for _, lwwset := range LWWSets {
 		for _, lwwnode := range lwwset.Add {
 			if lwwnode.Value == "" {
