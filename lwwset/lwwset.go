@@ -107,7 +107,7 @@ func (lwwset LWWSet) orderList() LWWSet {
 			"Time greater than remove": latestValue(lwwNode.Value, lwwset.Remove).Timestamp.UnixNano() < lwwNode.Timestamp.UnixNano(),
 		}).Debug("member check")
 
-		if !isPresent(lwwNode.Value, lwwset.Remove) || (isPresent(lwwNode.Value, lwwset.Remove) && latestValue(lwwNode.Value, lwwset.Remove).Timestamp.UnixNano() < lwwNode.Timestamp.UnixNano()) {
+		if !isPresent(lwwNode.Value, lwwset.Remove) || latestValue(lwwNode.Value, lwwset.Remove).Timestamp.UnixNano() < lwwNode.Timestamp.UnixNano() {
 			log.WithFields(log.Fields{
 				"set":   lwwset,
 				"value": lwwset.Add,
