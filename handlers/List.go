@@ -16,8 +16,10 @@ func List(w http.ResponseWriter, r *http.Request) {
 		LWWSet, _ = Sync(LWWSet)
 	}
 
+	set := make([]string, 0)
+
 	// Get the values from the LWWSet
-	set := LWWSet.List()
+	LWWSet, set = LWWSet.List()
 
 	// DEBUG log in the case of success
 	// indicating the new LWWSet
