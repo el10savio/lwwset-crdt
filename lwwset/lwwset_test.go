@@ -23,11 +23,11 @@ func TestList(t *testing.T) {
 	lwwset, _ = lwwset.Addition("xx")
 
 	expectedValue := []string{"xx"}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestList_UpdatedValue checks the functionality of LWWSet List() when
@@ -39,11 +39,11 @@ func TestList_UpdatedValue(t *testing.T) {
 	lwwset, _ = lwwset.Addition("zz")
 
 	expectedValue := []string{"xx", "yy", "zz"}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestList_RemoveValue checks the functionality of LWWSet List() when
@@ -55,11 +55,11 @@ func TestList_RemoveValue(t *testing.T) {
 	lwwset, _ = lwwset.Removal("zz")
 
 	expectedValue := []string{}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestList_RemoveEmpty checks the functionality of LWWSet List() when
@@ -69,11 +69,11 @@ func TestList_RemoveEmpty(t *testing.T) {
 	lwwset, _ = lwwset.Removal("zz")
 
 	expectedValue := []string{}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestList_NoValue checks the functionality of LWWSet List() when
@@ -81,11 +81,11 @@ func TestList_RemoveEmpty(t *testing.T) {
 // an empty string slice when the LWWSet is empty
 func TestList_NoValue(t *testing.T) {
 	expectedValue := []string{}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestClear checks the basic functionality of LWWSet Clear()
@@ -93,27 +93,27 @@ func TestList_NoValue(t *testing.T) {
 func TestClear(t *testing.T) {
 	lwwset, _ = lwwset.Addition("xx1")
 	lwwset, _ = lwwset.Addition("xx2")
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 
 	expectedValue := []string{}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestClear_EmptyStore checks the functionality of LWWSet Clear() utility function
 // when no values are in it, it clears all the values in a LWWSet set
 func TestClear_EmptyStore(t *testing.T) {
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 
 	expectedValue := []string{}
-	actualValue := lwwset.List()
+	_, actualValue := lwwset.List()
 
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestLookup checks the basic functionality of LWWSet Lookup() function
@@ -127,7 +127,7 @@ func TestLookup(t *testing.T) {
 	assert.Nil(t, actualError)
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestLookup_NotPresent checks the functionality of LWWSet Lookup() function
@@ -141,7 +141,7 @@ func TestLookup_NotPresent(t *testing.T) {
 	assert.Nil(t, actualError)
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestLookup_NotPresent checks the functionality of LWWSet Lookup() function
@@ -156,7 +156,7 @@ func TestLookup_Removed(t *testing.T) {
 	assert.Nil(t, actualError)
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestLookup_EmptySet checks the functionality of LWWSet Lookup() function
@@ -168,7 +168,7 @@ func TestLookup_EmptySet(t *testing.T) {
 	assert.Nil(t, actualError)
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }
 
 // TestLookup_EmptyLookup checks the functionality of LWWSet Lookup() function
@@ -182,5 +182,5 @@ func TestLookup_EmptyLookup(t *testing.T) {
 	assert.Equal(t, expectedError, actualError)
 	assert.Equal(t, expectedValue, actualValue)
 
-	lwwset = lwwset.Clear()
+	lwwset = Clear()
 }

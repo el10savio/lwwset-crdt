@@ -211,8 +211,7 @@ func Merge(LWWSets ...LWWSet) LWWSet {
 
 // Clear is utility function used only for tests
 // to empty the contents of a given LWWSet
-func (lwwset LWWSet) Clear() LWWSet {
-	lwwset.Add = LWWNodeSlice{}
-	lwwset.Remove = LWWNodeSlice{}
+func Clear() LWWSet {
+	lwwset := Initialize()
 	return lwwset
 }
