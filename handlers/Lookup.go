@@ -46,6 +46,6 @@ func Lookup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return HTTP 200 OK if
-	// thevalue is present
+	// the value is present
 	w.WriteHeader(http.StatusOK)
 }
