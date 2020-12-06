@@ -45,9 +45,14 @@ We can also lookup if certain values are present in the set
 
 ```
 $ curl -i -X GET localhost:8082/lwwset/lookup/user1
-> {"present":true}
+{
+    present: true
+}
+
 $ curl -i -X GET localhost:8082/lwwset/lookup/user3
-> {"present":false}
+{
+    present: false
+}
 ```
 
 ## Steps
