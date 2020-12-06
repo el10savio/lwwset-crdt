@@ -1,11 +1,18 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
+
+// IsPresent is the JSON struct
+// encapsulating the Lookup Response
+type IsPresent struct {
+	Present bool `json:"present"`
+}
 
 // Lookup is the HTTP handler used to return
 // if a given value is present in the LWWSet node in the server
@@ -38,14 +45,16 @@ func Lookup(w http.ResponseWriter, r *http.Request) {
 		"present": present,
 	}).Debug("successful lwwset lookup")
 
-	// Return HTTP 404 Not Found
-	// if the value is not present
-	if present == false {
-		w.WriteHeader(http.StatusNotFound)
+	isPresent := IsPresent{present}
+
+	JSONResponse, err := json.Marshal(isPresent)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Error("failed to json marshall lookup lwwset value")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return HTTP 200 OK if
-	// the value is present
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(JSONResponse)
 	w.WriteHeader(http.StatusOK)
 }
